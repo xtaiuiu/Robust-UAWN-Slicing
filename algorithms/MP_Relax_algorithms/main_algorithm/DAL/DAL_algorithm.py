@@ -6,7 +6,9 @@ import numpy as np
 from algorithms.MP_Relax_algorithms.main_algorithm.BCD.BCD_algorithm import bcd_al
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_cvx, \
     optimize_p_BFGS
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 # solve the problem presented at the top by penalty Lagrangian method with BCD
 # lam and rho are updated according to Algorithm 2 in "PENALTY DUAL DECOMPOSITION METHOD FOR
 # NONSMOOTH NONCONVEX OPTIMIZATION—PART I"
@@ -39,8 +41,8 @@ def DAL_alg(prob, x_init, p_init, subx_optimizer=optimize_x_cvx, subp_optimizer=
     f_cur = prob.objective_function(x, p)
     while n < n_max and abs((f_cur - f_prev)) > eps and abs((f_cur - f_prev)/f_prev) > eps:
     #while n < n_max and abs((f_prev - f_cur)/f_cur) > eps and abs(x@p - prob.P) > 0.1:
-        print(f"DAL: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
-              f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x@p}")
+        logger.debug(f"DAL: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, "
+                f"f_cur = {f_cur: .2f} equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x @ p}")
         f_prev = f_cur
         t1 = time.perf_counter()
         f_cur, x, p, n_x, n_p = bcd_al(prob, lam, rho, x, p, subx_optimizer, subp_optimizer, x_first=False, eps=eps)
@@ -52,7 +54,6 @@ def DAL_alg(prob, x_init, p_init, subx_optimizer=optimize_x_cvx, subp_optimizer=
             lam = min(max(lam, lam_min), lam_max)
         rho /= beta
         n += 1
-    #print(f" DAL finished in n = {n}, f_pre = {f_prev: .8f}, f_cur = {f_cur: .8f}, constraint = {x@p - prob.P: .8f}")
     return prob.objective_function(x, p), x, p, n, np.array(n_inner_x), np.array(n_inner_p), np.array(BCD_times)
 
 

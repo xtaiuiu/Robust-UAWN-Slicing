@@ -80,7 +80,7 @@ def scenario_to_problem(sc):
     else:
         gamma_u = np.sqrt(gamma)  # \Gamma(\phi_u) in the paper
         h = min(pn.h_max, max(uav.h_bar - gamma_u, pn.h_min, omega_u / np.tan(uav.theta)))
-        print(f"h* = {h} (calculated in {'DAL_wrapper' if 'DAL_wrapper' in [f.function for f in inspect.stack()] else 'bcd_al'})")
+        # print(f"h* = {h} (calculated in {'DAL_wrapper' if 'DAL_wrapper' in [f.function for f in inspect.stack()] else 'bcd_al'})")
         uav.h = h
 
         # Then, generate the problem object
@@ -109,7 +109,6 @@ if __name__ == '__main__':
     # save_scenario(sc, 'sc_2_slices.pickle')
     # sc = load_scenario('sc_2_slices.pickle')
     prob = scenario_to_problem(sc)
-    print(f"p_max = {prob.P}, b_tot = {prob.B_tot}, c = {prob.c}")
     if not prob.is_feasible:
         raise ValueError("The problem is infeasible")
     else:

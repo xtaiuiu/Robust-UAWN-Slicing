@@ -1,10 +1,10 @@
 ----------------------------- GPyOpt Report file -----------------------------------
 GPyOpt Version 1.2.6
-Date and time:               Tue Sep  9 22:52:22 2025
+Date and time:               Wed Sep 10 20:42:03 2025
 Optimization completed:      YES, 23 samples collected.
 Number initial samples:      5 
 Tolerance:                   1e-08.
-Optimization time:           3.864518880844116 seconds.
+Optimization time:           3.3783767223358154 seconds.
 
 -------------------------------- Problem set up ------------------------------------
 Problem name:                no_name
@@ -28,6 +28,6 @@ Evaluator type (batch size): sequential (1)
 Cores used:                  1
 
 --------------------------------- Summary ------------------------------------------
-Value at minimum:            -1141.03755401
-Best found minimum location: -1.95576976 -1.27481819
+Value at minimum:            -648.31902212
+Best found minimum location: -1.2301151   3.29886892
 ----------------------------------------------------------------------------------------------

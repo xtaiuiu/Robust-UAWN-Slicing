@@ -1,3 +1,4 @@
+import logging
 import time
 
 import numpy as np
@@ -10,6 +11,8 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.Benchmark_static_power im
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_alg
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_BFGS
 from scenarios.scenario_creators import scenario_to_problem, create_scenario
+
+LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
 
 
 class MyBayesianOptimization(BayesianOptimization):
@@ -94,6 +97,8 @@ def optimize_horizontal_Bayesian(sc, eps=1e-6, filename=None):
 
 
 if __name__ == "__main__":
+    logging.disable(logging.INFO)
+
     #np.random.seed(0)
     sc = create_scenario(50, 100)
     # sc.plot_scenario_kde()

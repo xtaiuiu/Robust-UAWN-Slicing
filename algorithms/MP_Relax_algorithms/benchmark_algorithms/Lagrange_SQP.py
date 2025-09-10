@@ -9,7 +9,9 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.Benchmark_static_power im
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_alg
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_p_BFGS, optimize_x_cvx
 
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 def Lag_SQP_alg(prob, x_init, p_init, eps=1e-6):
     """
     :param prob: the optimization problem
@@ -32,7 +34,7 @@ def Lag_SQP_alg(prob, x_init, p_init, eps=1e-6):
     x, p = x_init, p_init
 
     f_cur = prob.objective_function(x, p)
-    print(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
+    logger.debug(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
           f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x @ p}")
     while n < n_max and abs((f_cur - f_prev)) > eps and abs((f_cur - f_prev)/f_cur) > eps:
     #while n < n_max and abs((f_prev - f_cur)/f_cur) > eps and abs(x@p - prob.P) > 0.1:
@@ -43,7 +45,7 @@ def Lag_SQP_alg(prob, x_init, p_init, eps=1e-6):
             lam = min(max(lam, lam_min), lam_max)
         rho /= beta
         n += 1
-        print(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
+        logger.debug(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
             f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x @ p}")
 
     #print(f" DAL finished in n = {n}, f_pre = {f_prev: .8f}, f_cur = {f_cur: .8f}, constraint = {x@p - prob.P: .8f}")

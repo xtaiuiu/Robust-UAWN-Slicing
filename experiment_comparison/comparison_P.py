@@ -16,6 +16,7 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_BFGS
 from scenarios.scenario_creators import create_scenario, scenario_to_problem
 
+LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
 
 def run_save(n_repeats=100):
     logging.disable(logging.INFO)
@@ -23,7 +24,7 @@ def run_save(n_repeats=100):
     print(f"****************************simulation started at {time.asctime()} *******************************")
     step = 10
     powers = np.arange(2, 9) * step
-    pd_columns = ['DAL_P', 'SHIO', 'FPS', 'AIW-PSO', 'AL_SQP']
+    pd_columns = ['DAL_P', 'SHIO', 'FPS', 'AIW-PSO', 'AL-SQP']
     df_power_UE_avg = pd.DataFrame(np.zeros((len(powers), len(pd_columns))), columns=pd_columns)
 
     for repeat in range(n_repeats):
@@ -36,10 +37,10 @@ def run_save(n_repeats=100):
 
             f_static, x_static, p_static = static_power_alloc(prob)
 
-            model_pso = GBO.OriginalGBO(epoch=500, pop_size=50)
+            model_pso = GBO.OriginalGBO(epoch=400, pop_size=50)
             f_pso, x_pso = optimize_by_heuristic(prob, model_pso)
 
-            model_shio = SHIO.OriginalSHIO(epoch=500, pop_size=50)
+            model_shio = SHIO.OriginalSHIO(epoch=400, pop_size=50)
             f_shio, x_shio = optimize_by_heuristic(prob, model_shio)
             f_sqp, x_sqp, p_sqp, _ = Lag_SQP_alg(prob, x_static, p_static)
             # f_sca, x_sca, p_sca, _ = sca_majorant_with_backtracking(prob, x0=x_static, p0=p_static, tol=1e-6,
@@ -76,8 +77,8 @@ def load_plot():
     ##################### df_DAL_iter_avg #######################
     df_DAL_iter_avg = pd.read_excel('df_power_UE_avg_major_100.xlsx', index_col=0)
     df_DAL_iter_avg /= 60
-    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL_SQP']
-    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL_SQP']]
+    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL-SQP']
+    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL-SQP']]
     G = np.arange(df_DAL_iter_avg.shape[0])
     plt.rcParams.update({'font.size': fontsize})
 
@@ -91,5 +92,5 @@ def load_plot():
 
 
 if __name__ == '__main__':
-    run_save(10)
+    run_save(1)
     load_plot()
