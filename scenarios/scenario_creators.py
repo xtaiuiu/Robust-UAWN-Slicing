@@ -16,7 +16,7 @@ import numpy as np
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.GPM_algorithm import gpm_x
 
 
-def create_scenario(n_slices, network_radius, p_max=10000, b_tot=100):
+def create_scenario(n_slices, network_radius, p_max=50, b_tot=100):
     # a scenario consists of: an UAV, a physical network (mainly physical parameters), a set of slices
 
     #(self, uav, p_max, b_tot, radius, h_min, h_max, theta_min, theta_max, t_s, g_0, alpha):
@@ -104,26 +104,30 @@ if __name__ == '__main__':
     from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_p_BFGS, optimize_x_cvx
 
     np.random.seed(0)
-    sc = create_scenario(50, 100)
+    sc = create_scenario(100, 100)
+    sc.pn.b_tot = 400
     # save_scenario(sc, 'sc_2_slices.pickle')
     # sc = load_scenario('sc_2_slices.pickle')
     prob = scenario_to_problem(sc)
+    print(f"p_max = {prob.P}, b_tot = {prob.B_tot}, c = {prob.c}")
     if not prob.is_feasible:
         raise ValueError("The problem is infeasible")
     else:
         lam, rho = 1, 1
         # f, x, p = bcd_al(prob, lam, rho, subx_optimizer=gpm_x, subp_optimizer=optimize_p_BFGS)
         # print(f"GPM-CVX: f = {f}, x = {x}, y = {p}")
-        # t = time.perf_counter()
-        # f, x, y, n = Lag_SQP_alg(prob, prob.x_u, prob.p_u)
-        # print(f"finished in {time.perf_counter() - t} sec, f = {f: .8f}")
+        t = time.perf_counter()
+        f, x, p, n = Lag_SQP_alg(prob, prob.x_u, prob.p_u)
+        print(f"DAL: xp - P = {np.dot(x, p) - prob.P}")
+        print(f"AL_SQP finished in {time.perf_counter() - t} sec, f = {f: .8f}")
 
         t = time.perf_counter()
         # use static allocation as a warm start
         f_static, x_static, p_static = static_power_alloc(prob)
-        f, x, y, _, _, _, _ = DAL_alg(prob, x_static, p_static, subx_optimizer=optimize_x_cvx,
+        f, x, p, _, _, _, _ = DAL_alg(prob, prob.x_u, prob.p_u, subx_optimizer=optimize_x_cvx,
                                       subp_optimizer=optimize_p_BFGS)
-        print(f"finished in {time.perf_counter() - t} sec, f = {f: .8f}")
+        print(f"DAL: xp - P = {np.dot(x, p) - prob.P}")
+        print(f"DAL finished in {time.perf_counter() - t} sec, f = {f: .8f}")
 
     # check optimality
 

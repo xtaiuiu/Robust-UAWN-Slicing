@@ -10,7 +10,7 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_p_BFGS, optimize_x_cvx
 
 
-def Lag_SQP_alg(prob, x_init, p_init, eps=1e-4):
+def Lag_SQP_alg(prob, x_init, p_init, eps=1e-6):
     """
     :param prob: the optimization problem
     :param x_init: the initial x
@@ -20,7 +20,7 @@ def Lag_SQP_alg(prob, x_init, p_init, eps=1e-4):
     """
     # check feasibility
     if prob.x_u@prob.c > prob.B_tot or prob.x_u@prob.p_u > prob.P:
-        raise ValueError(f"!!! Lag_pgd_alg: infeasible problem.  !!! \n B_tot = {prob.B_tot}, "
+        raise ValueError(f"!!! Lag_pgd_alg: infeasible problem.  !!! B_tot = {prob.B_tot}, "
                          f"c*x_u = {prob.x_u@prob.c}, P = {prob.P}, dot_pu_xu = "
                          f"{prob.x_u@prob.p_u}")
     # the main algorithm for my paper
@@ -32,16 +32,20 @@ def Lag_SQP_alg(prob, x_init, p_init, eps=1e-4):
     x, p = x_init, p_init
 
     f_cur = prob.objective_function(x, p)
+    print(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
+          f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x @ p}")
     while n < n_max and abs((f_cur - f_prev)) > eps and abs((f_cur - f_prev)/f_cur) > eps:
     #while n < n_max and abs((f_prev - f_cur)/f_cur) > eps and abs(x@p - prob.P) > 0.1:
-        print(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
-              f"equ_constraint = {np.dot(x, p) - prob.P: .6f}")
         f_prev = f_cur
         f_cur, x, p = solve_augmented_lagrange_cvxpy(prob, lam, rho, x, p)
-        lam += (np.dot(x, p) - prob.P) / rho
-        lam = min(max(lam, lam_min), lam_max)
+        if abs(np.dot(x, p) - prob.P) > 1:
+            lam += (np.dot(x, p) - prob.P) / rho
+            lam = min(max(lam, lam_min), lam_max)
         rho /= beta
         n += 1
+        print(f"AL_SQP: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
+            f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x @ p}")
+
     #print(f" DAL finished in n = {n}, f_pre = {f_prev: .8f}, f_cur = {f_cur: .8f}, constraint = {x@p - prob.P: .8f}")
     return prob.objective_function(x, p), x, p, n
 

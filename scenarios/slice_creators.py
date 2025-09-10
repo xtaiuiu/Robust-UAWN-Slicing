@@ -11,7 +11,8 @@ def create_slice(n_UEs, tilde_R_l, tilde_R_u, b_width, network_radius):
 def create_slice_set(n_slices, network_radius):
     # create a randomly generated slice set
     slice_set = []
-    bandwidths = np.array([0.1, 0.05])
+    # bandwidths = np.array([0.1, 0.05])
+    bandwidths = np.array([1])  # for test only
     tilde_R_ls = np.array([0.1, 0.2])
     tilde_R_us = np.array([0.2, 0.3])
     num_UEs = np.array([1])

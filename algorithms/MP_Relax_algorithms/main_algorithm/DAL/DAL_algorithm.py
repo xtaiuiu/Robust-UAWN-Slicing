@@ -37,21 +37,19 @@ def DAL_alg(prob, x_init, p_init, subx_optimizer=optimize_x_cvx, subp_optimizer=
     BCD_times = []  # the time spend in BCD
 
     f_cur = prob.objective_function(x, p)
-    while n < n_max and abs((f_cur - f_prev)) > eps and abs((f_cur - f_prev)/f_cur) > eps:
+    while n < n_max and abs((f_cur - f_prev)) > eps and abs((f_cur - f_prev)/f_prev) > eps:
     #while n < n_max and abs((f_prev - f_cur)/f_cur) > eps and abs(x@p - prob.P) > 0.1:
         print(f"DAL: n = {n}, f_pre = {f_prev: .2f}, lam = {lam: .6f}, rho = {rho: .6f}, f_cur = {f_cur: .2f} "
-              f"equ_constraint = {np.dot(x, p) - prob.P: .6f}")
+              f"equ_constraint = {np.dot(x, p) - prob.P: .6f}, xp = {x@p}")
         f_prev = f_cur
         t1 = time.perf_counter()
         f_cur, x, p, n_x, n_p = bcd_al(prob, lam, rho, x, p, subx_optimizer, subp_optimizer, x_first=False, eps=eps)
         BCD_times.append(round(time.perf_counter() - t1, 8))
         n_inner_x.append(n_x)
         n_inner_p.append(n_p)
-        x0, p0 = x, p
-        lam += (np.dot(x, p) - prob.P) / rho
-        lam = min(max(lam, lam_min), lam_max)
-        # if np.linalg.norm(np.dot(x, p) - prob.P) > beta*equ_norm_pre:
-        #     rho /= beta
+        if abs(np.dot(x, p) - prob.P) > 1:
+            lam += (np.dot(x, p) - prob.P) / rho
+            lam = min(max(lam, lam_min), lam_max)
         rho /= beta
         n += 1
     #print(f" DAL finished in n = {n}, f_pre = {f_prev: .8f}, f_cur = {f_cur: .8f}, constraint = {x@p - prob.P: .8f}")

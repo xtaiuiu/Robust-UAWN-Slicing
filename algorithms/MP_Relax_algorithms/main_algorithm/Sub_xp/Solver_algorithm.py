@@ -28,12 +28,16 @@ def optimize_x_cvx(prob, lam, rho, p, x0, eps=1e-2):
     constraints = [x >= prob.x_u, prob.c @ x <= prob.B_tot]
     problem = cp.Problem(cp.Minimize(obj), constraints)
     # problem.solve(solver=cp.CLARABEL)
+    # print("Objective:", problem.objective)
+    # print("Constraints:")
+    # for c in problem.constraints:
+    #     print(c)
 
     try:
-        problem.solve(solver=cp.MOSEK, verbose=False)
-    except SolverError:
-        print(f"Problem was not solved to optimality. Status: {problem.status}")
         problem.solve(solver=cp.CLARABEL, verbose=False)
+    except SolverError as e:
+        print(f"Problem was not solved to optimality. Status: {problem.status}, Msg: {e}")
+        problem.solve(solver=cp.MOSEK, verbose=False)
 
     # test feasibility
     if min(x.value - prob.x_u) + eps < 0 or prob.c@x.value > prob.B_tot + eps:
