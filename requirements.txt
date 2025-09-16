@@ -1,0 +1,7 @@
+numpy>=1.26.4
+mealpy>=3.0.1
+scipy>=1.16.1
+matplotlib>=3.9.1
+pandas>=2.2.2
+cvxpy>=1.5.2
+GPyOpt>=1.2.6

@@ -92,6 +92,6 @@ def plot_UE(UE_set, network_radius):
 
 if __name__ == '__main__':
     network_radius = 4
-    UE_set = create_UE_set(100, network_radius, 1, 2)
+    UE_set = create_UE_set(50, network_radius, 1, 2)
     save_UE(UE_set)
     plot_UE(UE_set, network_radius)

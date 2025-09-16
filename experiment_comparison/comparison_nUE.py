@@ -54,7 +54,7 @@ def run_save(n_repeats=100):
             #     x_init, p_init = x_shio[:l], x_shio[l:]
 
             f_warm, x_warm, p_warm, _, _, _, _ = DAL_alg(prob, x_static, p_static, subx_optimizer=optimize_x_cvx,
-                                                         subp_optimizer=optimize_p_BFGS, eps=1e-6)
+                                                         subp_optimizer=optimize_p_BFGS)
             df_rate.iloc[i, 0] = f_warm
             df_rate.iloc[i, 1] = f_shio
             df_rate.iloc[i, 2] = f_static
@@ -73,13 +73,13 @@ def run_save(n_repeats=100):
 
 
 def load_plot():
-    fontsize = 20
+    fontsize = 18
     step = 10
     n_UEs = np.arange(2, 9) * step
     ##################### df_DAL_iter_avg #######################
     df_DAL_iter_avg = pd.read_excel('df_DAL_UE_avg_major_100.xlsx', index_col=0)
-    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL-SQP']
-    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL-SQP']]
+    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL-SQP', 'SCA']
+    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL-SQP', 'SCA']]
     row_indices = step * (df_DAL_iter_avg.index + 2)
     df_DAL_iter_avg = df_DAL_iter_avg.div(row_indices, axis=0)
     G = np.arange(df_DAL_iter_avg.shape[0])
@@ -91,9 +91,11 @@ def load_plot():
     ax.set_xticks(G)
     # plt.ylim((0.295, 0.5))
     ax.set_xticklabels([str((i + 2) * step) for i in G], fontsize=fontsize)
+    # ax.legend(bbox_to_anchor=(0.8, 0.36), loc='center')
+
     plt.show()
 
 
 if __name__ == '__main__':
-    run_save(1)
+    # run_save(100)
     load_plot()

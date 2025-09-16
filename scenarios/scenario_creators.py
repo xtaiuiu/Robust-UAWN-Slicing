@@ -16,7 +16,7 @@ import numpy as np
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.GPM_algorithm import gpm_x
 
 
-def create_scenario(n_slices, network_radius, p_max=50, b_tot=100):
+def create_scenario(n_slices, network_radius, p_max=1, b_tot=20, n_UEs_per_slice=10):
     # a scenario consists of: an UAV, a physical network (mainly physical parameters), a set of slices
 
     #(self, uav, p_max, b_tot, radius, h_min, h_max, theta_min, theta_max, t_s, g_0, alpha):
@@ -26,23 +26,24 @@ def create_scenario(n_slices, network_radius, p_max=50, b_tot=100):
     uav_height_prev = 10
     uav_theta = np.pi/3
     uav_speed = 5
-    uav_height_prev = 20
+    uav_height_prev = 50
     uav_x, uav_y = 50, 0
     uav_x_bar, uav_y_bar = 0, -network_radius
     uav = Uav(uav_height, uav_height_prev, uav_theta, uav_speed, uav_x, uav_y, uav_x_bar, uav_y_bar)
 
     # network parameters
-    h_min = 10
-    h_max = 200
+    h_min = 50
+    h_max = 500
     theta_min = np.pi/10
     theta_max = np.pi/2.5
     t_s = 100
     #g_0 = 5
     g_0 = 3.24e-4
     alpha = 4
-    sigma = 4e-15
+    N_0 = 4.0e-21  # background noise power density, in W/Hz, which is -174 dBm/Hz.
+    sigma = 1e6 * N_0  # background noise power, we consider a maximum bandwidth of 1 MHz
     pn = PhysicalNetwork(uav, p_max, b_tot, network_radius, h_min, h_max, theta_min, theta_max, t_s, g_0, alpha, sigma)
-    slices = create_slice_set(n_slices, network_radius)
+    slices = create_slice_set(n_slices, network_radius, n_UEs_per_slice)
     scenario = Scenario(pn, uav, slices)
     return scenario
 
@@ -103,8 +104,8 @@ def scenario_to_problem(sc):
 if __name__ == '__main__':
     from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_p_BFGS, optimize_x_cvx
 
-    np.random.seed(0)
-    sc = create_scenario(100, 100)
+    # np.random.seed(0)
+    sc = create_scenario(20, 500)
     sc.pn.b_tot = 400
     # save_scenario(sc, 'sc_2_slices.pickle')
     # sc = load_scenario('sc_2_slices.pickle')
@@ -123,10 +124,10 @@ if __name__ == '__main__':
         t = time.perf_counter()
         # use static allocation as a warm start
         f_static, x_static, p_static = static_power_alloc(prob)
-        f, x, p, _, _, _, _ = DAL_alg(prob, prob.x_u, prob.p_u, subx_optimizer=optimize_x_cvx,
+        f, x, p, _, _, _, _ = DAL_alg(prob, x_static, p_static, subx_optimizer=optimize_x_cvx,
                                       subp_optimizer=optimize_p_BFGS)
         print(f"DAL: xp - P = {np.dot(x, p) - prob.P}")
-        print(f"DAL finished in {time.perf_counter() - t} sec, f = {f: .8f}")
+        print(f"DAL finished in {time.perf_counter() - t} sec, f = {f: .8f}, f_static = {f_static}")
 
     # check optimality
 
