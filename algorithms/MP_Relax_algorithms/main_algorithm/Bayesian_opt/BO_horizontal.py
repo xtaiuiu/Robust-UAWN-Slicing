@@ -11,9 +11,10 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.Benchmark_static_power im
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_alg
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_BFGS
 from scenarios.scenario_creators import scenario_to_problem, create_scenario
+from utils.logger import get_logger
 
-LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
-
+LOG_LEVEL = logging.WARNING  # Change to DEBUG for more verbose output
+logger = get_logger(__name__)
 
 class MyBayesianOptimization(BayesianOptimization):
     # an override BO class, which only alters the plotting functions
@@ -21,20 +22,128 @@ class MyBayesianOptimization(BayesianOptimization):
         '''
         Plots to evaluate the convergence of standard Bayesian optimization algorithms
         '''
+        plt.rcParams.update({'font.size': 18})
         Xdata, best_Y = self.X, self.Y_best
         n = Xdata.shape[0]
         plt.figure(figsize=(8, 6))
         # Estimated m(x) at the proposed sampling points
         plt.plot(list(range(n)), -best_Y, '-o')
-        plt.title(r'Convergence of $B^3CD$')
+        # plt.title(r'Convergence of $BO$')
         plt.xlabel('Iteration')
-        plt.ylabel('Best Objective Value')
+        plt.ylabel('Total data rate (Mbps)')
         grid(True)
 
         if filename != None:
             savefig(filename)
         else:
             plt.show()
+
+
+    def plot_mean(self, filename=None):
+        # plot the posterior mean of the surrogate model
+        pass
+        # n = self.X.shape[0]
+        # colors = np.linspace(0, 1, n)
+        # cmap = plt.cm.Reds
+        # norm = plt.Normalize(vmin=0, vmax=1)
+        #
+        # # define plot func
+        # points_var_color = lambda X: plt.scatter(X[:, 0], X[:, 1], c=colors, label=u'observations', cmap=cmap,
+        #                                          norm=norm, s=50)
+        # points_one_color = lambda X: plt.plot(X[:, 0], X[:, 1], 'r.', markersize=10, label=u'observations')
+        #
+        # # generate grid
+        # X1 = np.linspace(bounds[0][0], bounds[0][1], 200)
+        # X2 = np.linspace(bounds[1][0], bounds[1][1], 200)
+        # x1, x2 = np.meshgrid(X1, X2)
+        # X = np.hstack((x1.reshape(200 * 200, 1), x2.reshape(200 * 200, 1)))
+        # acqu = acquisition_function(X)
+        # acqu_normalized = (-acqu - min(-acqu)) / (max(-acqu - min(-acqu)))
+        # acqu_normalized = acqu_normalized.reshape((200, 200))
+        # m, v = model.predict(X)
+        # m = -m
+        #
+        # # ===== 1. Posterior mean =====
+        # plt.figure()
+        # contour_mean = plt.contourf(X1, X2, m.reshape(200, 200), 100)
+        # plt.colorbar(contour_mean, ticks=np.linspace(-2, 1, 4), format='%d')
+        # if color_by_step:
+        #     points_var_color(Xdata)
+        # else:
+        #     points_one_color(Xdata)
+        # plt.xlabel(label_x)
+        # plt.ylabel(label_y)
+        # # plt.title('Posterior mean')
+        # plt.axis((bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]))
+        # # plt.gca().set_aspect('equal')
+        # plt.legend()
+        # if filename:
+        #     plt.savefig(f"{filename}_mean.png", bbox_inches='tight')
+        # plt.show()
+        #
+        # # ===== 新增：Posterior mean (3D Mesh) =====
+        # fig = plt.figure(figsize=(10, 7))
+        # ax = fig.add_subplot(111, projection='3d')
+        # surf = ax.plot_surface(
+        #     x1, x2, m.reshape(200, 200),  # X1, X2, Z
+        #     cmap='viridis',
+        #     rstride=5, cstride=5,
+        #     alpha=0.8,
+        #     linewidth=0,
+        #     antialiased=True
+        # )
+        # ax.scatter(
+        #     Xdata[:, 0], Xdata[:, 1], -m.min(),
+        #     c='red', marker='o', s=50, label='Observations'
+        # )
+        # ax.set_xticks([])
+        # ax.set_yticks([])
+        # ax.set_zticks([])
+        # ax.set_xlabel('')
+        # ax.set_ylabel('')
+        # ax.set_zlabel('')
+        # ax.set_title('')
+        # ax.grid(True)
+        # if filename:
+        #     plt.savefig(f"{filename}_mean_3d.png", bbox_inches='tight')
+        # plt.show()
+        #
+        # # ===== 2. Posterior std =====
+        # plt.figure()
+        # contour_std = plt.contourf(X1, X2, np.sqrt(v.reshape(200, 200)), 100)
+        # plt.colorbar(contour_std, ticks=np.linspace(0, 0.3, 4), format='%.1f')
+        # if color_by_step:
+        #     points_var_color(Xdata)
+        # else:
+        #     points_one_color(Xdata)
+        # plt.xlabel(label_x)
+        # plt.ylabel(label_y)
+        # # plt.title('Posterior sd.')
+        # plt.axis((bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]))
+        # # plt.gca().set_aspect('equal')
+        # plt.legend()
+        # if filename:
+        #     plt.savefig(f"{filename}_sd.png", bbox_inches='tight')
+        # plt.show()
+        # if filename != None:
+        #     savefig(filename)
+        # else:
+        #     plt.show()
+
+    def plot_std(self, filename=None):
+        # plot the posterior standard deviation of the surrogate model
+        if filename != None:
+            savefig(filename)
+        else:
+            plt.show()
+
+    def plot_contour(self, filename=None):
+        # plot the contour of the surrogate model
+        if filename != None:
+            savefig(filename)
+        else:
+            plt.show()
+
 
 def optimize_horizontal_Bayesian(sc, eps=1e-6, filename=None):
     def DAL_wrapper(X):
@@ -83,11 +192,11 @@ def optimize_horizontal_Bayesian(sc, eps=1e-6, filename=None):
     myProblem = MyBayesianOptimization(DAL_wrapper, bounds, X=X, Y=Y, normalize_Y=True, exact_feval=True)
     myProblem.run_optimization(max_iter=15, eps=1e-8, report_file='report.txt')
     print(f"runtime with X and Y in {time.perf_counter() - t} seconds")
-    myProblem.save_report('saved_report.txt')
-    myProblem.save_evaluations("saved_evaluations.csv")
-    myProblem.plot_acquisition(label_x="x", label_y="y")
-    myProblem.plot_convergence(filename=filename)
-    plt.show()
+    # myProblem.save_report('saved_report.txt')
+    # myProblem.save_evaluations("saved_evaluations.csv")
+    # myProblem.plot_acquisition(label_x="x", label_y="y")
+    # myProblem.plot_convergence(filename=filename)
+    # plt.show()
 
     # print(f"runtime without X and Y in {time.perf_counter() - t} seconds")
 
@@ -100,7 +209,7 @@ if __name__ == "__main__":
     logging.disable(logging.INFO)
 
     #np.random.seed(0)
-    sc = create_scenario(50, 100)
+    sc = create_scenario(5, 100)
     # sc.plot_scenario_kde()
     # sc.reset_scenario()
     #

@@ -10,6 +10,9 @@ from scipy.optimize import linprog
 def static_power_alloc(prob, max_iter=100):
     f_opt, x_opt, p_opt = 1e8, prob.x_u, prob.p_u
     p_increment = (prob.P - prob.x_u@prob.p_u)/len(prob.a)/(max_iter*4)
+    if p_increment < 0:
+        raise ValueError(f"p_increment is negative, p_increment = {p_increment}, Bx = {prob.c@prob.x_u}"
+                         f"b_tot = {prob.B_tot}, xp = {prob.x_u@prob.p_u}, P = {prob.P}")
     n, p = 0, prob.p_u
     while n < max_iter:
 

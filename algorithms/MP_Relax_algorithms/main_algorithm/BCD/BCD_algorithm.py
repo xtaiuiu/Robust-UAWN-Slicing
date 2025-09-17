@@ -27,7 +27,7 @@ def bcd_al(prob, lam, rho, x_init, p_init, subx_optimizer=optimize_x_cvx,
     x, p = x_init, p_init  # an initial feasible point
     f_old = 1e8
     f = prob.Lagrangian_value(x, p, lam, rho)
-    n, n_max = 0, 50000
+    n, n_max = 0, 200
     n_subx, n_subp = 0, 0  # the number of the solved sub-problems Sub_x and Sub_p, respectively
     while abs((f - f_old)/f) > eps and abs(f - f_old) > eps and n < n_max:
         # if np.linalg.norm(prob.g_x(x, p, lam, rho)) < 0.1:

@@ -24,7 +24,7 @@ LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
 def run_save(n_repeats=100):
     logging.disable(logging.INFO)
     t = time.perf_counter()
-    print(f"****************************simulation started at {time.asctime()} *******************************")
+    print(f"**************************** simulation started at {time.asctime()} *******************************")
     step = 25
     bandwidths = np.arange(2, 9) * step
     pd_columns = ['DAL_B', 'SHIO', 'FPS', 'AIW-PSO', 'AL-SQP']
@@ -36,7 +36,7 @@ def run_save(n_repeats=100):
         for i in range(len(bandwidths)):
             print(
                 f" ####################### repeat = {repeat}, bandwidth = {bandwidths[i]} #############################")
-            sc = create_scenario(50, 500, b_tot=bandwidths[i], p_max=50)
+            sc = create_scenario(5, 100, b_tot=bandwidths[i], p_max=10, n_UEs_per_slice=10)
             prob = scenario_to_problem(sc)
 
             f_static, x_static, p_static = static_power_alloc(prob)
@@ -71,8 +71,8 @@ def run_save(n_repeats=100):
 
         df_bandwidth_UE_avg += df_rate
     df_bandwidth_UE_avg /= (-n_repeats)
-    df_bandwidth_UE_avg.to_excel("df_DAL_bandwidth_avg_major_100.xlsx")
-    print(f"compare B finished in {time.perf_counter() - t}")
+    df_bandwidth_UE_avg.to_excel(f"bandwidth_compare_major_{time.asctime()}.xlsx")
+    print(f"compare B finished at {time.asctime()}, time duration: {time.perf_counter() - t}")
     # df_bandwidth_UE_avg.plot()
     # plt.show()
 
@@ -81,7 +81,7 @@ def load_plot():
     fontsize =18
     step = 25
     ##################### df_DAL_iter_avg #######################
-    df_DAL_iter_avg = pd.read_excel('df_DAL_bandwidth_avg_major_100.xlsx', index_col=0)
+    df_DAL_iter_avg = pd.read_excel('bandwidth_compare_major_.xlsx', index_col=0)
     df_DAL_iter_avg /= 50
     df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL-SQP', 'SCA']
     df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL-SQP', 'SCA']]
@@ -102,5 +102,5 @@ def load_plot():
 
 
 if __name__ == '__main__':
-    # run_save(100)
-    load_plot()
+    run_save(1)
+    # load_plot()

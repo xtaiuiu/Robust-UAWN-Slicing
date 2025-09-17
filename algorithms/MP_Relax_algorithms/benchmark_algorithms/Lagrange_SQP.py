@@ -114,7 +114,7 @@ def solve_augmented_lagrange_cvxpy(prob, lam, rho, x_init, p_init):
         method='SLSQP',
         bounds=bounds,
         constraints=constraints,
-        options={'maxiter': 1000, 'ftol': 1e-6, 'disp': False}
+        options={'maxiter': 1000, 'ftol': 1e-6, 'disp': True}
     )
     
     if not result.success:
