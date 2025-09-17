@@ -81,10 +81,10 @@ def load_plot():
     fontsize =18
     step = 25
     ##################### df_DAL_iter_avg #######################
-    df_DAL_iter_avg = pd.read_excel('bandwidth_compare_major_.xlsx', index_col=0)
+    df_DAL_iter_avg = pd.read_excel('df_DAL_bandwidth_avg_major_100.xlsx', index_col=0)
     df_DAL_iter_avg /= 50
-    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'AL-SQP', 'SCA']
-    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'AL-SQP', 'SCA']]
+    df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'SQP', 'SCA']
+    df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'SQP', 'SCA']]
 
     G = np.arange(df_DAL_iter_avg.shape[0])
     plt.rcParams.update({'font.size': fontsize})
@@ -102,5 +102,5 @@ def load_plot():
 
 
 if __name__ == '__main__':
-    run_save(1)
-    # load_plot()
+    # run_save(1)
+    load_plot()

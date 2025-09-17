@@ -73,7 +73,7 @@ def sca_majorant_with_backtracking(prob, x0=None, p0=None,
     # initialization (feasible)
     if x0 is None:
         # simple feasible initial x: allocate proportionally to 1/c then ensure >= x_u
-        w = np.maximum(c, 1e-12)
+        w = np.maximum(c, 1e-8)
         x_init = (B_tot / np.sum(w)) * (1.0 / w)
         x_init = np.maximum(x_init, x_u)
         # if still violates due to x_u, scale down
@@ -91,7 +91,7 @@ def sca_majorant_with_backtracking(prob, x0=None, p0=None,
 
     if p0 is None:
         # feasible p such that x^T p <= P; simple choose p = max(p_u, P / sum(x0) )
-        p_init = np.maximum(p_u, (P / (np.sum(x0) + 1e-12)) * np.ones(N))
+        p_init = np.maximum(p_u, (P / (np.sum(x0) + 1e-8)) * np.ones(N))
         p0 = p_init
 
     xk = x0.copy()

@@ -12,14 +12,14 @@ def create_slice_set(n_slices, network_radius, n_UEs_per_slice):
     # create a randomly generated slice set
     slice_set = []
     embb_bandwidths = np.array([0.1, 0.2, 0.5])
-    urllc_bandwidths = np.array([0.01, 0.5])
+    urllc_bandwidths = np.array([0.01, 0.05])
     # bandwidths = np.array([1])  # for test only
     # num_UEs = np.array([1])
     for i in range(n_slices):
         slice_type = np.random.choice(['embb', 'urllc'])
         if slice_type == 'embb':
             b_width = np.random.choice(embb_bandwidths)
-            r_sla = np.random.uniform(0.1, 1)
+            r_sla = np.random.uniform(0.1, 0.5)
         else:  # urllc slice
             b_width = np.random.choice(urllc_bandwidths)
             r_sla = np.random.uniform(0.01, 0.05)
