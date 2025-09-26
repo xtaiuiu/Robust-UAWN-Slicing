@@ -1,52 +1,17 @@
 import numpy as np
-from scipy.optimize import minimize
+import matplotlib.pyplot as plt
 
-# Define a non-convex smooth objective function (e.g., Rosenbrock function)
-def objective(x):
-    return (1 - x[0])**2 + 100 * (x[1] - x[0]**2)**2  # Example: Rosenbrock function
+xk = np.array([0.9, 0.9])
+pk = np.array([0.8, 0.8])
+P = 1.0
 
-# Define the gradient of the objective (optional for better performance)
-def grad_objective(x):
-    grad = np.zeros_like(x)
-    grad[0] = -2 * (1 - x[0]) - 400 * x[0] * (x[1] - x[0]**2)
-    grad[1] = 200 * (x[1] - x[0]**2)
-    return grad
+X, Y = np.meshgrid(np.linspace(0,1.5,100), np.linspace(0,1.5,100))
+Z = 0.5*((X+Y)**2) - xk[0]*X - xk[1]*Y - pk[0]*X - pk[1]*Y
+rhs = P - 0.5*(np.sum(xk**2) + np.sum(pk**2))
 
-# Define the constraints: x >= 0 and a linear constraint c^T x <= B
-def constraint1(x):
-    return x[0]  # x[0] >= 0
-
-def constraint2(x):
-    return x[1]  # x[1] >= 0
-
-def constraint3(x, c, B):
-    return B - np.dot(c, x)  # c^T x <= B
-
-# Set up the problem data
-c = np.array([1, 2])
-B = 10
-x0 = np.array([2, 2])  # Initial guess
-
-# Define constraints
-constraints = [
-    {'type': 'ineq', 'fun': constraint1},
-    {'type': 'ineq', 'fun': constraint2},
-    {'type': 'ineq', 'fun': constraint3, 'args': (c, B)}
-]
-
-# Solve the problem using the 'trust-constr' method
-result = minimize(
-    objective,
-    x0,
-    jac=grad_objective,  # Optional: Provide the gradient if available
-    method='trust-constr',  # Trust-region method for non-convex problems
-    constraints=constraints,
-    options={'disp': True}  # Display optimization progress
-)
-
-# Check results
-if result.success:
-    print("Optimal solution:", result.x)
-    print("Objective function value:", result.fun)
-else:
-    print("Optimization failed:", result.message)
+plt.contourf(X, Y, Z <= rhs, levels=1)
+plt.colorbar()
+plt.scatter(xk[0], xk[1], color='red', label='xk')
+plt.scatter(pk[0], pk[1], color='blue', label='pk')
+plt.legend()
+plt.show()

@@ -6,7 +6,7 @@ import time
 
 import numpy as np
 from matplotlib import pyplot as plt
-from mealpy import PSO, FloatVar
+from mealpy import PSO
 from mealpy.math_based import SHIO
 from mealpy.utils.problem import Problem
 from pathlib import Path

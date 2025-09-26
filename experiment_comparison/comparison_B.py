@@ -4,11 +4,9 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from mealpy import PSO, FloatVar
 from mealpy.evolutionary_based import DE
 from mealpy.math_based import SHIO, AOA, CEM, CGO, PSS, RUN, GBO
-from mealpy.physics_based import ArchOA
-from mealpy.utils.problem import Problem
+
 
 from algorithms.MP_Relax_algorithms.benchmark_algorithms.Heuristic_algorithm import optimize_by_heuristic
 from algorithms.MP_Relax_algorithms.benchmark_algorithms.Lagrange_SQP import Lag_SQP_alg

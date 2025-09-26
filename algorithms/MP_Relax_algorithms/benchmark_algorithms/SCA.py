@@ -1,4 +1,5 @@
 import time
+import warnings
 
 import numpy as np
 import cvxpy as cp
@@ -7,6 +8,7 @@ from algorithms.MP_Relax_algorithms.benchmark_algorithms.Lagrange_SQP import Lag
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.Benchmark_static_power import static_power_alloc
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_alg
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_BFGS
+from scenarios.scenario_creators import create_scenario, scenario_to_problem
 
 
 def sca_majorant_with_backtracking(prob, x0=None, p0=None,
@@ -70,29 +72,6 @@ def sca_majorant_with_backtracking(prob, x0=None, p0=None,
     def unpack(u):
         return u[:N].copy(), u[N:].copy()
 
-    # initialization (feasible)
-    if x0 is None:
-        # simple feasible initial x: allocate proportionally to 1/c then ensure >= x_u
-        w = np.maximum(c, 1e-8)
-        x_init = (B_tot / np.sum(w)) * (1.0 / w)
-        x_init = np.maximum(x_init, x_u)
-        # if still violates due to x_u, scale down
-        if (c @ x_init) > B_tot:
-            # scale down towards x_u
-            surplus = (c @ x_init) - B_tot
-            # simple fallback: set x = x_u and try uniform remainder (if any)
-            x_init = x_u.copy()
-            free = B_tot - (c @ x_init)
-            if free > 0:
-                # distribute free proportional to 1/c
-                add = free * (1.0 / w) / np.sum(1.0 / w)
-                x_init += add
-        x0 = x_init
-
-    if p0 is None:
-        # feasible p such that x^T p <= P; simple choose p = max(p_u, P / sum(x0) )
-        p_init = np.maximum(p_u, (P / (np.sum(x0) + 1e-8)) * np.ones(N))
-        p0 = p_init
 
     xk = x0.copy()
     pk = p0.copy()
@@ -120,7 +99,8 @@ def sca_majorant_with_backtracking(prob, x0=None, p0=None,
         while alpha_local >= alpha_min and backtries < backtrack_max:
             # gradient step center
             v = uk - alpha_local * gradk
-            v_x = v[:N]; v_p = v[N:]
+            v_x = v[:N]
+            v_p = v[N:]
 
             # solve projection QP: min ||x - v_x||^2 + ||p - v_p||^2
             # s.t. x >= x_u, p >= p_u, c^T x <= B_tot,
@@ -163,7 +143,7 @@ def sca_majorant_with_backtracking(prob, x0=None, p0=None,
 
             # check majorant inequality:
             lhs = G(x_cand, p_cand)
-            rhs = Gk + gradk.dot(ucand - uk) + 0.5 * (1.0 / alpha_local) * np.linalg.norm(ucand - uk)**2
+            rhs = Gk + gradk.dot(ucand - uk) + (1.0 / (2 * alpha_local)) * np.linalg.norm(ucand - uk)**2
 
             if lhs <= rhs + 1e-8:
                 accepted = True
@@ -213,26 +193,31 @@ if __name__ == '__main__':
     from algorithms.MP_Relax_algorithms.MP_Relax_problem import create_optimization_instance
 
     # np.random.seed(0)
-    prob = create_optimization_instance(n=50)
-    t = time.perf_counter()
+    sc = create_scenario(1, 100, b_tot=100, p_max=50)
+    prob = scenario_to_problem(sc)
     # use static allocation as a warm start
     f_static, x_static, p_static = static_power_alloc(prob)
+    assert (x_static >= prob.x_u).all()
+    assert (p_static >= prob.p_u).all()
+    assert x_static.dot(p_static) <= prob.P, f"x_static.dot(p_static) -  prob.P = {x_static.dot(p_static) - prob.P}"
+    #
+    # t = time.perf_counter()
+    # f, x, p, n = Lag_SQP_alg(prob, prob.x_u, prob.p_u)
+    # print(f"SQP finished in {time.perf_counter() - t} sec, f = {f: .8f}")
 
-    f_opt, x_opt, p_opt, iters = sca_majorant_with_backtracking(prob, x0=prob.x_u, p0=prob.p_u, tol=1e-4, verbose=True)
-    print("Optimal value:", f_opt)
-    # print("x* =", x_opt)
+    t = time.perf_counter()
+    # f_opt, x_opt, p_opt, iters = sca_majorant_with_backtracking(prob, x0=prob.x_u, p0=prob.p_u, tol=1e-4, verbose=True)
+    f_opt, x_opt, p_opt, iters = sca_majorant_with_backtracking(prob, x0=x_static, p0=p_static, tol=1e-4, verbose=True)
+    print("SCA Optimal value:", f_opt)
+    print(f"x^Tp = {x_opt @ p_opt: .8f}, P = {prob.P: .8f}, x^Tp - P = {x_opt @ p_opt - prob.P: .8f}")
     # print("p* =", p_opt)
     print("iterations:", iters)
     print("execution time: ", time.perf_counter() - t)
-
-    t = time.perf_counter()
-    f, x, y, n = Lag_SQP_alg(prob, prob.x_u, prob.p_u)
-    print(f"finished in {time.perf_counter() - t} sec, f = {f: .8f}")
 
     t = time.perf_counter()
     # use static allocation as a warm start
     f_static, x_static, p_static = static_power_alloc(prob)
     f, x, y, _, _, _, _ = DAL_alg(prob, x_static, p_static, subx_optimizer=optimize_x_cvx,
                                   subp_optimizer=optimize_p_BFGS)
-    print(f"finished in {time.perf_counter() - t} sec, f = {f: .8f}")
+    print(f"RUNs finished in {time.perf_counter() - t} sec, f = {f: .8f}")
 

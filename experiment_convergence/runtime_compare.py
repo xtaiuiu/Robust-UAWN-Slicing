@@ -9,7 +9,7 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from mealpy import PSO, FloatVar
+from mealpy import PSO
 from mealpy.math_based import SHIO, GBO
 from mealpy.utils.problem import Problem
 
@@ -26,11 +26,11 @@ LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
 
 def run_save(n_repeats=100):
     logging.disable(logging.INFO)
-    t = time.perf_counter()
+    t0 = time.perf_counter()
     print(f"****************************simulation started at {time.asctime()} *******************************")
     n_UEs = np.array([2, 4, 6, 8, 10])
     # n_UEs = np.array([12])
-    pd_columns = ['AL-SQP', 'RUNs']
+    pd_columns = ['SQP', 'RUNs', 'SCA']
     df_rate_avg = pd.DataFrame(np.zeros((len(n_UEs), len(pd_columns))), columns=pd_columns)
     df_time_avg = pd.DataFrame(np.zeros((len(n_UEs), len(pd_columns))), columns=pd_columns)
 
@@ -50,12 +50,6 @@ def run_save(n_repeats=100):
             df_time.iloc[i, 0] = t_sqp
             df_rate.iloc[i, 0] = f_sqp
 
-            # t = time.perf_counter()
-            # f_sca, x_sca, p_sca, _ = sca_majorant_with_backtracking(prob, x0=x_static, p0=p_static, tol=1e-6,
-            #                                                         verbose=False)
-            # df_time.iloc[i, 1] = time.perf_counter() - t
-            # df_rate.iloc[i, 1] = f_sca
-
             t = time.perf_counter()
             f_runs, x_runs, p_runs, _, _, _, _ = DAL_alg(prob, x_static, p_static, subx_optimizer=optimize_x_cvx,
                                                          subp_optimizer=optimize_p_BFGS)
@@ -63,21 +57,29 @@ def run_save(n_repeats=100):
             df_time.iloc[i, 1] = t_runs
             df_rate.iloc[i, 1] = f_runs
 
+            t = time.perf_counter()
+            f_sca, x_sca, p_sca, _ = sca_majorant_with_backtracking(prob, x0=x_static, p0=p_static, tol=1e-6,
+                                                                       verbose=False)
+            t_sca = time.perf_counter() - t
+
+            df_time.iloc[i, 2] = t_sca
+            df_rate.iloc[i, 2] = f_sca
+
             print(f"f_RUNs = {f_runs: .8f}, f_fps = {f_static: .8f}, "
-                  f"f_sqp = {f_sqp: .8f}")
-            print(f"t_RUNs = {t_runs: .8f}, t_sqp = {t_sqp: .8f}")
+                  f"f_sqp = {f_sqp: .8f}", f"f_sca = {f_sca: .8f}")
+            print(f"t_RUNs = {t_runs: .8f}, t_sqp = {t_sqp: .8f}, t_sca = {t_sca: .8f}")
 
         df_rate_avg += df_rate
         df_time_avg += df_time
     df_rate_avg /= (-n_repeats)
     df_time_avg /= n_repeats
-    df_rate_avg.to_excel("df_rate_avg_major_100.xlsx")
-    df_time_avg.to_excel("df_time_avg_major_100.xlsx")
-    print(f"finished in {time.perf_counter() - t}")
+    df_rate_avg.to_excel("df_rate_avg_major_with_sca.xlsx")
+    df_time_avg.to_excel("df_rate_avg_major_with_sca.xlsx")
+    print(f"finished in {time.perf_counter() - t0}")
     df_rate_avg.plot()
     df_time_avg.plot()
     plt.show()
 
 
 if __name__ == "__main__":
-    run_save(100)
+    run_save(20)
