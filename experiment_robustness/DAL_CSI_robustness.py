@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -15,6 +16,7 @@ from algorithms.MP_Relax_algorithms.main_algorithm.DAL.Benchmark_static_power im
 from algorithms.MP_Relax_algorithms.main_algorithm.DAL.DAL_algorithm import DAL_alg
 from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm import optimize_x_cvx, optimize_p_BFGS
 from scenarios.scenario_creators import create_scenario, scenario_to_problem
+BASE_DIR = Path(__file__).resolve().parent
 
 
 def run_save(n_repeats=100):
@@ -43,7 +45,8 @@ def run_save(n_repeats=100):
                 sc.reset_UE_Delta_g()
         df_robust_avg += df_rate
     df_robust_avg /= (-n_repeats)
-    df_robust_avg.to_excel("df_robust_avg.xlsx")
+    excel_path = BASE_DIR / "df_robust_avg.xlsx"
+    df_robust_avg.to_excel(excel_path)
     print(f"compare B finished in {time.perf_counter() - t}")
     df_robust_avg.plot()
     plt.show()
@@ -53,7 +56,8 @@ def load_plot():
     fontsize = 20
     step = 0.01
     ##################### df_robust_avg #######################
-    df_DAL_iter_avg = pd.read_excel('df_PoR_avg.xlsx', index_col=0)
+    excel_path = BASE_DIR / "df_robust_avg.xlsx"
+    df_DAL_iter_avg = pd.read_excel(excel_path, index_col=0)
     df_DAL_iter_avg.columns = np.array([r"$\vartheta = 0.01$", r"$\vartheta = 0.05$", r"$\vartheta=0.1$"])
     G = np.arange(df_DAL_iter_avg.shape[0])
     plt.rcParams.update({'font.size': fontsize})
@@ -66,7 +70,8 @@ def load_plot():
     ax.set_xticklabels([str((i) * step) for i in G], fontsize=fontsize)
 
     ##################### df_robust_price_avg #######################
-    df_DAL_iter_avg = pd.read_excel('df_robust_price_avg.xlsx', index_col=0) * 100
+    excel_path_rpor = BASE_DIR / "df_robust_price_avg.xlsx"
+    df_DAL_iter_avg = pd.read_excel(excel_path_rpor, index_col=0) * 100
     df_DAL_iter_avg.columns = np.array([r"$\vartheta = 0.01$", r"$\vartheta = 0.05$", r"$\vartheta=0.1$"])
     G = np.arange(df_DAL_iter_avg.shape[0])
     plt.rcParams.update({'font.size': fontsize})

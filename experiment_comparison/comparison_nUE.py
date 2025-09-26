@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -17,6 +18,8 @@ from algorithms.MP_Relax_algorithms.main_algorithm.Sub_xp.Solver_algorithm impor
 from scenarios.scenario_creators import create_scenario, scenario_to_problem
 
 LOG_LEVEL = logging.INFO  # Change to DEBUG for more verbose output
+BASE_DIR = Path(__file__).resolve().parent
+
 def run_save(n_repeats=100):
     logging.disable(logging.INFO)
     t = time.perf_counter()
@@ -66,7 +69,8 @@ def run_save(n_repeats=100):
 
         df_DAL_UE_avg += df_rate
     df_DAL_UE_avg /= (-n_repeats)
-    df_DAL_UE_avg.to_excel("df_DAL_UE_avg_major_100.xlsx")
+    excel_path = BASE_DIR / "df_DAL_UE_avg_major_100.xlsx"
+    df_DAL_UE_avg.to_excel(excel_path)
     print(f"finished in {time.perf_counter() - t}")
     # df_DAL_UE_avg.plot()
     # plt.show()
@@ -77,7 +81,9 @@ def load_plot():
     step = 10
     n_UEs = np.arange(2, 9) * step
     ##################### df_DAL_iter_avg #######################
-    df_DAL_iter_avg = pd.read_excel('df_DAL_UE_avg_major_100.xlsx', index_col=0)
+    excel_path = BASE_DIR / "df_DAL_UE_avg_major_100.xlsx"
+
+    df_DAL_iter_avg = pd.read_excel(excel_path, index_col=0)
     df_DAL_iter_avg.columns = ['RUNs', 'SHIO', 'FPS', 'GBO', 'SQP', 'SCA']
     df_DAL_iter_avg = df_DAL_iter_avg[['RUNs', 'SHIO', 'GBO', 'SQP', 'SCA']]
     row_indices = step * (df_DAL_iter_avg.index + 2)

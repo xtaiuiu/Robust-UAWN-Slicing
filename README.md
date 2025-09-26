@@ -40,6 +40,11 @@ You will get the following results.
 ![Convergence of Bayesian optimization](BO_iteration.png)
 
 #### 2. Comparing RUNs with benchmarks
+
+**Note: the following commands read our previous results from exiting excel files.
+If you want to run the simulation by yourself, please see the code of these scripts, each of which contains a run() function.**
+
+
 Run the following commands to see our comparisons with existing benchmarks, including SCA, SQP, SHIO, and GBO.
 
 1). Comparison under different available bandwidths.
