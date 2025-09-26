@@ -30,7 +30,7 @@ This repository contains has multiple entrypoints to run the simulation.
 
 The following command will generate a four-cell UAWN scenario, and run Bayesian optimization (BO)-eanbled RUNs framework
 ```bash
-python four_cell_scenario.py 
+python -m algorithms.MP_Relax_algorithms.main_algorithm.Bayesian_opt.BO_horizontal
 ```
 You will get the following results.
 ![Four-cell UAWN scenario](BO_four_cell.png)
@@ -40,19 +40,41 @@ You will get the following results.
 ![Convergence of Bayesian optimization](BO_iteration.png)
 
 #### 2. Comparing RUNs with benchmarks
-Run the following command to see our comparisons with existing benchmarks, including SCA, SQP, SHIO, and GBO.
-```bash
-python compare_with_benchmarks.py 
-```
-You will get the following results.
+Run the following commands to see our comparisons with existing benchmarks, including SCA, SQP, SHIO, and GBO.
 
-#### 3. 2D UAV deployment and slicing
+1). Comparison under different available bandwidths.
+
 ```bash
+python -m experiment_comparison.comparison_B
 ```
 
-#### 4. Robustness of RUNs
+![Comparison under different bandwidths](comparison_B.png)
+
+2). Comparison under different available powers.
+
 ```bash
+python -m experiment_comparison.comparison_P
 ```
+![Comparison under different powers](comparison_P.png)
+
+3). Comparison under different numbers of users.
+
+```bash
+python -m experiment_comparison.comparison_nUE
+```
+
+![Comparison under different problem sizes](comparison_UE.png)
+
+
+#### 3. Robustness of RUNs
+
+Run the following command to see the price of robustness (PoR) and relative PoR (RPoR) of RUNs.
+```bash
+python -m experiment_robustness.DAL_CSI_robustness
+```
+
+![PoR](PoR.png)
+![RPoR](RPoR.png)
 
 For the detailed design principles of RUNs, please refer to our paper.
 

@@ -174,6 +174,7 @@ def optimize_horizontal_Bayesian(sc, eps=1e-6, filename=None):
               {'name': 'y', 'type': 'continuous', 'domain': (-R, R)}]
 
     t = time.perf_counter()
+    print(f" Bayesian optimization started...")
     # Get center coordinates and create initial points array
     X = np.array([
 #        [0, 0],                         # Center of cell
@@ -194,9 +195,9 @@ def optimize_horizontal_Bayesian(sc, eps=1e-6, filename=None):
     print(f"runtime with X and Y in {time.perf_counter() - t} seconds")
     # myProblem.save_report('saved_report.txt')
     # myProblem.save_evaluations("saved_evaluations.csv")
-    # myProblem.plot_acquisition(label_x="x", label_y="y")
-    # myProblem.plot_convergence(filename=filename)
-    # plt.show()
+    myProblem.plot_acquisition(label_x="x", label_y="y")
+    myProblem.plot_convergence(filename=filename)
+    plt.show()
 
     # print(f"runtime without X and Y in {time.perf_counter() - t} seconds")
 
@@ -209,7 +210,7 @@ if __name__ == "__main__":
     logging.disable(logging.INFO)
 
     #np.random.seed(0)
-    sc = create_scenario(5, 100)
+    sc = create_scenario(2, 100)
     # sc.plot_scenario_kde()
     # sc.reset_scenario()
     #
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     #
     # sc.uav.u_x, sc.uav.u_y = 0, 0
     # f_cell_center = bcd(sc)  # the objective function at the center of the cell.
-    f_Bayes, x_Bayes = optimize_horizontal_Bayesian(sc, filename='convergence_curve.png')
+    f_Bayes, x_Bayes = optimize_horizontal_Bayesian(sc)
     # print(f"f_center = {f_center}, f_Bayes = {f_Bayes}, diff = {f_center - f_Bayes}")
     # print(f"f_cell_center = {f_cell_center}, f_Bayes = {f_Bayes}, diff = {f_cell_center - f_Bayes}")
     # print(f"x_center = {sc.get_UEs_center()}, x_Bayes = {x_Bayes}")
