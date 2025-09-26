@@ -1,6 +1,7 @@
 # generate a four-cell UAWN scenario
 import logging
 import pickle
+from pathlib import Path
 
 import numpy as np
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -11,12 +12,11 @@ from network_classes.scenario import Scenario
 import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.path import Path
-from matplotlib.colors import LogNorm
+# from matplotlib.colors import LogNorm
 from matplotlib import cm
 from scipy.stats import gaussian_kde
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+BASE_DIR = Path(__file__).resolve().parent
 
 class FourCellScenario:
     def __init__(self, cell_size=100, n_slices_per_cell=2, min_users_per_slice=10, max_users_per_slice=25):
@@ -136,7 +136,8 @@ def plot_scenario(ax, scenarios, slice_styles):
         ax.add_patch(cell)
 
         # Plot UAV
-        uav_icon = plt.imread("drone.png")
+        drone_path = BASE_DIR / "drone.png"
+        uav_icon = plt.imread(drone_path)
         imagebox = OffsetImage(uav_icon, zoom=0.035)  # 调整缩放比例
         ab = AnnotationBbox(imagebox, (scenario.uav.x + uav_movement[i][0],
                                        scenario.uav.y + uav_movement[i][1]), frameon=False, zorder=15)
@@ -231,7 +232,7 @@ def plot_scenario(ax, scenarios, slice_styles):
     ax.grid(True, linestyle='--', alpha=0.6)
 
 
-def create_four_cell_scenario(filename='four_cell_scenario.pkl'):
+def create_four_cell_scenario():
     """
     Create a four-cell scenario with default parameters.
 
@@ -244,7 +245,8 @@ def create_four_cell_scenario(filename='four_cell_scenario.pkl'):
         min_users_per_slice=20,  # 20-40 users per slice
         max_users_per_slice=40
     ).generate()
-    with open(filename, 'wb') as f:
+    file = BASE_DIR / 'four_cell_scenario.pkl'
+    with open(file, 'wb') as f:
         pickle.dump(scenarios, f)
 
     return scenarios
@@ -264,7 +266,8 @@ if __name__ == "__main__":
     # Create the four-cell scenario
     # four_cell = create_four_cell_scenario()
     # Load the four-cell scenario
-    with open('four_cell_scenario.pkl', 'rb') as f:
+    file = BASE_DIR / 'four_cell_scenario.pkl'
+    with open(file, 'rb') as f:
         four_cell = pickle.load(f)
 
     # Plot the scenario

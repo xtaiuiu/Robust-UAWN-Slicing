@@ -1,7 +1,7 @@
 # The RUNs Framework for Fast and Robust UAV Network Slicing - Simulation Code
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.12+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
 
 This repository contains the simulation code for the RUNs Framework UAWN Slicing.
 
@@ -10,10 +10,10 @@ This repository contains the simulation code for the RUNs Framework UAWN Slicing
 ## 🚀 Quick Start
 ### Installation
 
-#### 1. Install Python 3.10+
+#### 1. Install Python 3.12
 If you use conda, run the following command:
 ```bash
-conda create -n runs python=3.10
+conda create -n runs python=3.12
 conda activate runs
 ```
 
@@ -28,12 +28,17 @@ This repository contains has multiple entrypoints to run the simulation.
 
 #### 1. BO-eanbled RUNs framework for 3D UAV deployment and slicing
 
-The following command will generate a four-cell UAWN scenario, and run Bayesian optimization (BO)-eanbled RUNs framework
+The following command will generate a four-cell UAWN scenario.
+```bash
+python -m experiment_horizontal.four_cell_scenario
+```
+![Four-cell UAWN scenario](BO_four_cell.png)
+
+Run Bayesian optimization (BO)-eanbled RUNs framework by
 ```bash
 python -m algorithms.MP_Relax_algorithms.main_algorithm.Bayesian_opt.BO_horizontal
 ```
 You will get the following results.
-![Four-cell UAWN scenario](BO_four_cell.png)
 
 ![Posterior mean of the Bayesian surrogate model](BO_mean.png)
 
